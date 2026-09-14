@@ -1,0 +1,4 @@
+"""Gibbs sampler.
+
+TODO: implement.
+"""
