@@ -14,7 +14,7 @@ it has
 
 $$
 T(x) = \begin{bmatrix} x \\ x^2 \end{bmatrix}, \qquad
-\eta(\theta) = \begin{bmatrix} \dfrac{\mu}{\sigma^2} \\[6pt] -\dfrac{1}{2\sigma^2} \end{bmatrix}, \qquad
+\eta(\theta) = \begin{bmatrix} \dfrac{\mu}{\sigma^2} \\ -\dfrac{1}{2\sigma^2} \end{bmatrix}, \qquad
 A(\theta) = \frac{\mu^2}{2\sigma^2} + \tfrac{1}{2}\ln(2\pi\sigma^2), \qquad
 h(x) = 1 .
 $$
@@ -67,7 +67,7 @@ differentiating it with respect to $\eta$ returns $\mathbb{E}[T(x)]$.
 
 - $\partial A/\partial \eta_1 = \mathbb{E}[x] = \mu$ — verify numerically by finite
   differences against the analytic mean
-- $\partial^2 A/\partial \eta_1^2 = \operatorname{Var}[x] = \sigma^2$
+- $\partial^2 A/\partial \eta_1^2 = \mathrm{Var}[x] = \sigma^2$
 - round-trip $(\mu, \sigma^2) \to \eta \to (\mu, \sigma^2)$ is the identity
 - the canonical form evaluates to the same density as `scipy.stats.norm.pdf` across a
   grid of $x$
