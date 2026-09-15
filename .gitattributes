@@ -1,0 +1,3 @@
+*.pdf  binary -diff
+*.png  binary -diff
+*.jpg  binary -diff
