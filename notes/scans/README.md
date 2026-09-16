@@ -1,8 +1,12 @@
 # Scans
 
-Handwritten working, named to match the typed note it supports
-(`03-exponential-family.pdf` ↔ `03-exponential-family.md`).
+Handwritten working, prefixed with the note it supports. Where a note has one
+derivation, the names match exactly (`03-exponential-family.pdf` ↔
+`03-exponential-family.md`). Where a note covers several, add a suffix per sheet:
 
-Greyscale, 150–200 DPI, under ~2 MB per note. Git keeps every version forever, so
-scan once and scan properly. Check each page for anything that is not the derivation
-before committing.
+    02-conjugate-priors-beta-bernoulli.pdf
+    02-conjugate-priors-gaussian.pdf
+    02-conjugate-priors-predictive.pdf
+    02-conjugate-priors-dirichlet.pdf
+
+Link each scan from its own section rather than all from the note header.
