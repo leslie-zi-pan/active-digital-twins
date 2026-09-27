@@ -72,7 +72,7 @@ S, S, F, S:
 
 $$\mathbb{E}[\theta] = \frac{\alpha}{\alpha+\beta},
 \qquad
-\operatorname{Var}[\theta] = \frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}$$
+\text{Var}[\theta] = \frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}$$
 
 | Step | | $\alpha+\beta$ | Mean | Mode | Variance | SD |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -114,9 +114,9 @@ idea.
 ### Checks
 
 - $\text{Beta}(2,2)$ after S,S,F,S equals $\text{Beta}(5,3)$ exactly
-- hand-computed posteriors match `get_posterior_distribution_params` on `[1,1,0,1]`
+- hand-computed posteriors match `Beta.update([1,1,0,1])`
 - the variance is strictly decreasing across the sequence
-- $0 \le \operatorname{Var}[\theta] \le 0.25$ always — a Beta lives on $[0,1]$, so a
+- $0 \le \text{Var}[\theta] \le 0.25$ always — a Beta lives on $[0,1]$, so a
   variance outside that range is impossible and makes a cheap assertion
 
 ---
@@ -130,6 +130,7 @@ _To do._
 ## 3 · Gaussian–Gaussian
 
 **Handwritten working:** [scans/02-conjugate-priors-gaussian.pdf](scans/02-conjugate-priors-gaussian.pdf)
+— contains both routes below.
 
 ### Result
 
@@ -221,6 +222,63 @@ the observation is uninformative and $\mu_{\text{post}} \to \mu_0$.
 Note also that $\tau_{\text{post}} = \tau_0 + \tau$ is always greater than either input
 precision: **observing something can never make you less certain.**
 
+### An alternative route: matching coefficients
+
+The derivation above is *constructive* — it assumes nothing about the posterior's form
+and lets a Gaussian kernel fall out. A shorter route is available once you are willing
+to assume the form and solve for its parameters.
+
+State the model at three levels of explicitness:
+
+$$p(\theta \mid x) \propto p(x \mid \theta)\,p(\theta)$$
+
+$$p(\theta \mid x, \mu_0, \sigma_0^2, \sigma^2) \propto
+p(x \mid \theta, \sigma^2)\;p(\theta \mid \mu_0, \sigma_0^2)$$
+
+with the first factor the likelihood and the second the prior.
+
+$$\mathcal{N}(\theta \mid \mu_{\text{post}}, \sigma^2_{\text{post}}) \propto
+\mathcal{N}(x \mid \theta, \sigma^2)\,\mathcal{N}(\theta \mid \mu_0, \sigma_0^2)$$
+
+The second line is worth writing out: it makes explicit that $\mu_0$, $\sigma_0^2$ and
+$\sigma^2$ are known constants being *conditioned on*, not quantities being inferred.
+That distinction is what changes under unknown variance (where the conjugate prior
+becomes Normal–Inverse–Gamma) and again in hierarchical models. The third line is where
+this method's assumption lives — the posterior is *asserted* Gaussian.
+
+Expanding the exponent and collecting powers of $\theta$ gives
+
+$$(\tau_0 + \tau)\theta^2 - 2(\tau x + \tau_0\mu_0)\theta + C$$
+
+while the assumed posterior kernel expands to
+
+$$\tau_{\text{post}}\left(\theta^2 - 2\theta\mu_{\text{post}} + \mu_{\text{post}}^2\right)$$
+
+Equating coefficients:
+
+$$\theta^2:\quad \tau_{\text{post}} = \tau_0 + \tau$$
+
+$$\theta^1:\quad -2\tau_{\text{post}}\mu_{\text{post}} = -2(\tau x + \tau_0\mu_0)
+\;\Longrightarrow\;
+\mu_{\text{post}} = \frac{\tau x + \tau_0\mu_0}{\tau_{\text{post}}}$$
+
+Two equations, two unknowns, no completing the square.
+
+**The two routes are not interchangeable.** Completing the square *proves* the
+posterior is Gaussian; matching coefficients *presupposes* it and recovers the
+parameters. Used alone the second would be circular — it is a cheap confirmation once
+conjugacy is established, not a substitute for establishing it.
+
+**Matching coefficients is [note 03](03-exponential-family.md) in disguise.** Factor the
+$-\tfrac{1}{2}$ back in and the exponent reads $\eta_1\theta + \eta_2\theta^2 - A$ with
+$\eta_1 = \tau\mu$ and $\eta_2 = -\tau/2$ — precisely the Gaussian's natural parameters.
+The coefficients being matched *are* $\eta$, so "collect powers of $\theta$ and equate"
+is literally "add natural parameters", arrived at by hand without invoking the
+exponential family at all.
+
+> The scan writes $\theta_0$ for the prior mean in this second route; it is the same
+> quantity as $\mu_0$ above.
+
 ### Why it matters
 
 Applied recursively — with a state transition applied between successive observations
@@ -230,13 +288,15 @@ inferential idea there; it repeats this one in a loop.
 The reason conjugacy works at all is the subject of
 [note 03](03-exponential-family.md): the Gaussian's natural parameters are
 $\eta_1 = \mu/\sigma^2$ and $\eta_2 = -1/(2\sigma^2)$, and combining two Gaussians adds
-them. Since $\eta_2$ is a negative half-precision, *adding natural parameters is
-adding precisions*. This note shows that the update works; note 03 shows why it had to.
+them. Since $\eta_2$ is a negative half-precision, *adding natural parameters is adding
+precisions*. This note shows that the update works; note 03 shows why it had to.
 
 ### Checks
 
 - closed form matches a brute-force numerical posterior on a grid, to 5 d.p., across
   asymmetric cases — verified
+- the two derivation routes yield identical formulas — an independent check obtained
+  for free by deriving it twice
 - $\mu_0 = 0$, $\sigma_0^2 = 1$, $x = 2$, $\sigma^2 = 1$ gives $\mu_{\text{post}} = 1$,
   $\sigma^2_{\text{post}} = 0.5$ — equal precisions, so the mean sits exactly halfway
 - reducing $\sigma^2$ (a sharper observation) moves $\mu_{\text{post}}$ toward $x$
